@@ -13,6 +13,8 @@
 #include <fstream>
 #include <vector>
 #include <iostream>
+#include <tuple>
+#include <sstream>
 #include "rapidxml/rapidxml.hpp"
 #include "StateMachine.hpp"
 #include "State.hpp"
@@ -27,8 +29,9 @@ namespace FSM
     class StateMachineLoader
     {
     private:
-        static void createStateMachine(xml_node<>* _root_node, StateMachine& _stateMachine, std::vector<State*>& _statePool, std::vector<Transition*>& _transitionPool)
+        static void createStateMachine(xml_node<>* _root_node, StateMachine* _stateMachine, std::vector<State*>& _statePool, std::vector<Transition*>& _transitionPool)
         {
+            State* initState = nullptr;
             // iterate over states
             StateMachine::TransitionMap transitionMap = StateMachine::TransitionMap();
             for (xml_node<>* state_node = _root_node->first_node("state"); state_node; state_node = state_node->next_sibling("state"))
@@ -56,14 +59,23 @@ namespace FSM
                 {
                     MetaState* metaState = dynamic_cast<MetaState*>(*itState);
                     StateMachine* stateMachine = dynamic_cast<StateMachine*>(metaState);
-                    createStateMachine(state_node, *stateMachine, _statePool, _transitionPool);
+                    createStateMachine(state_node, stateMachine, _statePool, _transitionPool);
+                }
+                
+                // if the state is an initial state
+                if (state_node->first_attribute("initial"))
+                {
+                    initState = *itState;
                 }
                 
                 // interate over transitions
                 StateMachine::Transitions transitions = StateMachine::Transitions();
                 for(xml_node<> * transition_node = state_node->first_node("transition"); transition_node; transition_node = transition_node->next_sibling("transition"))
                 {
-                    StateMachine::TransitionStatePair transitionStatePair = StateMachine::TransitionStatePair();
+                    StateMachine::TransitionStatePair transitionStatePair;
+                    Transition* transition;
+                    State* next;
+                    int level;
                     auto newTransition = TransitionFactory::createInstance(transition_node->first_attribute("input")->value());
                     assert (newTransition);
                     auto itTrans = _transitionPool.end();
@@ -79,11 +91,11 @@ namespace FSM
                     {
                         _transitionPool.push_back(newTransition);
                         itTrans = _transitionPool.end()-1;
-                        transitionStatePair.first = _transitionPool.back();
+                        transition = _transitionPool.back();
                     }
                     else
                     {
-                        transitionStatePair.first = *itTrans;
+                        transition = *itTrans;
                     }
                     
                     auto newNext = StateFactory::createInstance(transition_node->first_attribute("next")->value());
@@ -100,27 +112,27 @@ namespace FSM
                     if (itNext == _statePool.end())
                     {
                         _statePool.push_back(newNext);
-                        transitionStatePair.second = _statePool.back();
+                        next = _statePool.back();
                     }
                     else
                     {
-                        transitionStatePair.second = *itNext;
+                        next = *itNext;
                     }
+                    if (!(std::istringstream(transition_node->first_attribute("level")->value()) >> level)) level = 0;
+                    transitionStatePair = std::make_tuple(transition, next, level, _stateMachine);
                     transitions.push_back(transitionStatePair);
-                    std::cout << "add transitionStatePair: " << transitionStatePair.first->getName() << " -> " << transitionStatePair.second->getName() << std::endl;
                 }
                 
                 transitionMap.insert(std::pair<State*, StateMachine::Transitions>(*itState, transitions));
-                std::cout << "add transitionMap: " << (*itState)->getName() << std::endl;
             }
             
-            _stateMachine.setTransitionMap(transitionMap);
+            _stateMachine->setTransitionMap(transitionMap, initState);
         }
         
     public:
-        static void loadStateMachine(const std::string& _filepath, StateMachine& _stateMachine, std::vector<State*>& _statePool, std::vector<Transition*>& _transitionPool)
+        static void loadStateMachine(const std::string& _filepath, StateMachine* _stateMachine, std::vector<State*>& _statePool, std::vector<Transition*>& _transitionPool)
         {
-            std::ifstream theFile ("FSMTest1.xml");
+            std::ifstream theFile (_filepath);
             std::vector<char> buffer((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
             buffer.push_back('\0');
             

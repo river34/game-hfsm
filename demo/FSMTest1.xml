@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+
+<fsm name="FSM_Test_1">
+    <state name="Patrol" initial="1">
+        <transition input="EnemySpotted" next="Combat" level="0"/>
+    </state>
+    <state name="Combat" meta="1">
+        <transition input="EnemyLost" next="Search" level="0"/>
+        <state name="Alert" initial="1">
+            <transition input="Timeout" next="Attack" level="0"/>
+        </state>
+        <state name="Attack">
+            <transition input="Timeout" next="Search" level="1"/>
+        </state>
+    </state>
+    <state name="Search">
+        <transition input="EnemySpotted" next="Combat" level="0"/>
+    </state>
+</fsm>
