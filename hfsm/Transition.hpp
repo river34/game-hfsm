@@ -23,6 +23,9 @@ namespace FSM
         std::string m_sName;
         
     public:
+        typedef Transition* (*createInstanceFn) (const std::string&);
+        
+    public:
         Transition(const std::string& _name) : m_sName(_name) { }
         virtual ~Transition() { }
         virtual bool isValid(const Blackboard* _blackboard) const { return true; }

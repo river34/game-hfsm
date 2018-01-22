@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include "StateCombat.hpp"
-#include "State.hpp"
+
 using namespace FSM;
 
 void StateCombat::onEnter()

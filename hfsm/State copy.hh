@@ -23,6 +23,9 @@ namespace FSM
         std::string m_sName;
         
     public:
+        typedef State* (*createInstanceFn) (const std::string&);
+        
+    public:
         State(const std::string& _name) : m_sName(_name) { }
         virtual ~State() { }
         virtual void onEnter() = 0;

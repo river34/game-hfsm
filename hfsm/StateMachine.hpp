@@ -41,7 +41,8 @@ namespace FSM
         State* m_pCurrState = nullptr;
         
     public:
-        inline StateMachine() { }
+        StateMachine() { }
+        virtual ~StateMachine() { }
         inline virtual void setTransitionMap(const TransitionMap& _transitions, State* _initState)
         {
             m_Transitions = _transitions;

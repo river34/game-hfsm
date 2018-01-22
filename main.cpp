@@ -8,13 +8,14 @@
 
 #include <iostream>
 #include <ctime>
-#include "StateMachine.hpp"
+#include "hfsm/StateMachine.hpp"
+#include "hfsm/State.hpp"
+#include "hfsm/Transition.hpp"
 #include "StateMachineLoader.hpp"
-#include "State.hpp"
-#include "Transition.hpp"
 #include "Blackboard.hpp"
 #include "GameEntity.hpp"
 
+using namespace std;
 using namespace FSM;
 
 int main(int argc, const char * argv[])
@@ -25,7 +26,8 @@ int main(int argc, const char * argv[])
     statePool.reserve(20);
     vector<Transition*> transitionPool = vector<Transition*>(0);
     transitionPool.reserve(20);
-    StateMachineLoader::loadStateMachine("FSMTest1.xml", &stateMachine, statePool, transitionPool);
+    StateMachineLoader* loader = new StateMachineLoader;
+    loader->loadStateMachine("FSMTest1.xml", &stateMachine, statePool, transitionPool);
     
     // check FSM
     std::cout << "# of states: " << statePool.size() << std::endl;
@@ -48,11 +50,13 @@ int main(int argc, const char * argv[])
     self.m_Position = GameMath::Vector3(0, 0, 0);
     self.m_Rotation = GameMath::Quaternion::identity();
     
+    float view = 1.0f;
+    
     // create Blackboard
     Blackboard blackboard = Blackboard();
-    blackboard.m_pSelf = &self;
-    blackboard.m_pEnemy = &enemy;
-    blackboard.m_fView = 1.f;
+    blackboard.registerEntry("self", &self);
+    blackboard.registerEntry("enemy", &enemy);
+    blackboard.registerEntry("view", &view);
     
     // run FSM
     clock_t begin = clock();

@@ -11,15 +11,18 @@
 
 #include <stdio.h>
 #include <iostream>
-#include "Transition.hpp"
+#include "../hfsm/Transition.hpp"
+
 using namespace FSM;
 
 class TransitionEnemyLost : public Transition
 {
 public:
-    TransitionEnemyLost(const std::string& _name) : Transition(_name) { };
+    TransitionEnemyLost(const std::string& _name) : Transition(_name) { }
+    virtual ~TransitionEnemyLost() { }
     bool isValid(const Blackboard* _blackboard) const;
-    void onTransition() const { std::cout << "transition EnemyLost" << std::endl; };
+    void onTransition() const { std::cout << "transition EnemyLost" << std::endl; }
+    inline static Transition* create(const std::string& _name) { return new TransitionEnemyLost(_name); }
 };
 
 #endif /* TransitionEnemyLost_hpp */

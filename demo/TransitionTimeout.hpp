@@ -11,15 +11,18 @@
 
 #include <stdio.h>
 #include <iostream>
-#include "Transition.hpp"
+#include "../hfsm/Transition.hpp"
+
 using namespace FSM;
 
 class TransitionTimeout : public Transition
 {
 public:
-    TransitionTimeout(const std::string& _name) : Transition(_name) { };
+    TransitionTimeout(const std::string& _name) : Transition(_name) { }
+    virtual ~TransitionTimeout() { }
     bool isValid(const Blackboard* _blackboard) const;
-    void onTransition() const { std::cout << "transition Timeout" << std::endl; };
+    void onTransition() const { std::cout << "transition Timeout" << std::endl; }
+    inline static Transition* create(const std::string& _name) { return new TransitionTimeout(_name); }
 };
 
 #endif /* TransitionTimeout_hpp */

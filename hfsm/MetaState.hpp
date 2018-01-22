@@ -19,7 +19,8 @@ namespace FSM
     class MetaState : public State, public StateMachine
     {
     public:
-        inline MetaState(const std::string& _name) : State(_name) { }
+        MetaState(const std::string& _name) : State(_name) { }
+        virtual ~MetaState() { }
         inline void onUpdate(const float _deltaTime, const Blackboard* _blackboard) { }
         inline virtual void setTransitionMap(const TransitionMap& _transitions) { m_Transitions = _transitions; m_pInitState = m_Transitions.begin()->first; }
     };
