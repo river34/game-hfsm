@@ -22,7 +22,7 @@ namespace FSM
         MetaState(const std::string& _name) : State(_name) { }
         virtual ~MetaState() { }
         inline void onUpdate(const float _deltaTime, const Blackboard* _blackboard) { }
-        inline virtual void setTransitionMap(const TransitionMap& _transitions) { m_Transitions = _transitions; m_pInitState = m_Transitions.begin()->first; }
+		inline virtual void setTransitionMap(const TransitionMap& _transitions, State* _initState) { m_Transitions = _transitions; m_pInitState = _initState; }
     };
 }
 

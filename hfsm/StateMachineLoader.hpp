@@ -15,10 +15,10 @@
 #include <iostream>
 #include <tuple>
 #include <sstream>
-#include "rapidxml/rapidxml.hpp"
-#include "hfsm/StateMachine.hpp"
-#include "hfsm/State.hpp"
-#include "hfsm/MetaState.hpp"
+#include "../rapidxml/rapidxml.hpp"
+#include "StateMachine.hpp"
+#include "State.hpp"
+#include "MetaState.hpp"
 #include "StateFactory.hpp"
 #include "TransitionFactory.hpp"
 
@@ -31,9 +31,12 @@ namespace FSM
     private:
         void createStateMachine(xml_node<>* _root_node, StateMachine* _stateMachine, std::vector<State*>& _statePool, std::vector<Transition*>& _transitionPool, StateFactory* _stateFactory, TransitionFactory* _transitionFactory)
         {
+			std::cout << "Creating state machine ............" << std::endl;
             State* initState = nullptr;
             // iterate over states
+			std::cout << "Iterate over states" << std::endl;
             StateMachine::TransitionMap transitionMap = StateMachine::TransitionMap();
+			std::cout << "_root_node: " << _root_node << std::endl;
             for (xml_node<>* state_node = _root_node->first_node("state"); state_node; state_node = state_node->next_sibling("state"))
             {
                 // create state
@@ -52,6 +55,7 @@ namespace FSM
                 {
                     _statePool.push_back(newState);
                     itState = _statePool.end()-1;
+					std::cout << "Add new state: " << newState->getName() << std::endl;
                 }
                 
                 // if the state is a metastate, create a sub state machine
@@ -66,6 +70,7 @@ namespace FSM
                 if (state_node->first_attribute("initial"))
                 {
                     initState = *itState;
+					std::cout << "initState: " << initState->getName() << std::endl;
                 }
                 
                 // interate over transitions
@@ -92,6 +97,7 @@ namespace FSM
                         _transitionPool.push_back(newTransition);
                         itTrans = _transitionPool.end()-1;
                         transition = _transitionPool.back();
+						std::cout << "Add new transition: " << newTransition->getName() << std::endl;
                     }
                     else
                     {
@@ -113,6 +119,7 @@ namespace FSM
                     {
                         _statePool.push_back(newNext);
                         next = _statePool.back();
+						std::cout << "Add new state: " << newState->getName() << std::endl;
                     }
                     else
                     {
@@ -121,6 +128,7 @@ namespace FSM
                     if (!(std::istringstream(transition_node->first_attribute("level")->value()) >> level)) level = 0;
                     transitionStatePair = std::make_tuple(transition, next, level, _stateMachine);
                     transitions.push_back(transitionStatePair);
+					std::cout << "Add new transition-state pair: " << transition->getName() << "-" << next->getName() << "-" << level << std::endl;
                 }
                 
                 transitionMap.insert(std::pair<State*, StateMachine::Transitions>(*itState, transitions));
@@ -133,24 +141,40 @@ namespace FSM
         }
         
     public:
-        void loadStateMachine(const std::string& _filepath, StateMachine* _stateMachine, std::vector<State*>& _statePool, std::vector<Transition*>& _transitionPool)
+        void loadStateMachine(const std::string& _file, StateMachine* _stateMachine, std::vector<State*>& _statePool, std::vector<Transition*>& _transitionPool, StateFactory* _stateFactory, TransitionFactory* _transitionFactory, bool _isFilepath)
         {
-            std::ifstream theFile (_filepath);
-            std::vector<char> buffer((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
-            buffer.push_back('\0');
+			std::vector<char> buffer;
+
+			if (_isFilepath == true)
+			{
+				std::ifstream theFile(_file);
+				buffer = std::vector<char>((std::istreambuf_iterator<char>(theFile)), std::istreambuf_iterator<char>());
+				std::cout << "Read filepath" << std::endl;
+			}
+			else
+			{
+				buffer = std::vector<char>(_file.begin(), _file.end());
+				std::cout << "Read file as string" << std::endl;
+			}
+
+			buffer.push_back('\0');
+
+			std::cout << "Loaded file size: " << buffer.size() << std::endl;
+
+			if (buffer.size() <= 1) return;
             
             // parse the buffer using the xml file parsing library into doc
             xml_document<> doc;
             doc.parse<0>(&buffer[0]);
+
+			std::cout << "Parsed the buffer using the xml file parsing library" << std::endl;
             
             // find the root node
             xml_node<>* root_node = doc.first_node("fsm");
+
+			std::cout << "root_node: " << root_node << std::endl;
             
-            // create factory
-            StateFactory* stateFactory = new StateFactory;
-            TransitionFactory* transitionFactory = new TransitionFactory;
-            
-            createStateMachine(root_node, _stateMachine, _statePool, _transitionPool, stateFactory, transitionFactory);
+            createStateMachine(root_node, _stateMachine, _statePool, _transitionPool, _stateFactory, _transitionFactory);
         }
     };
 }

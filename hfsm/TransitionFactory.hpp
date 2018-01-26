@@ -12,9 +12,6 @@
 #include <stdio.h>
 #include <map>
 #include "hfsm/Transition.hpp"
-#include "demo/TransitionEnemySpotted.hpp"
-#include "demo/TransitionEnemyLost.hpp"
-#include "demo/TransitionTimeout.hpp"
 #include "rapidxml/rapidxml.hpp"
 
 namespace FSM
@@ -28,12 +25,7 @@ namespace FSM
         FactoryMap m_FactoryMap;
         
     public:
-        TransitionFactory()
-        {
-            registerClass("EnemySpotted", &TransitionEnemySpotted::create);
-            registerClass("EnemyLost", &TransitionEnemyLost::create);
-            registerClass("Timeout", &TransitionTimeout::create);
-        }
+		TransitionFactory() { }
         ~TransitionFactory() { }
         void registerClass(const std::string& name, Transition::createInstanceFn pfnCreate)
         {

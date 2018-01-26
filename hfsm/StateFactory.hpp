@@ -14,11 +14,6 @@
 #include <string>
 #include "hfsm/State.hpp"
 #include "rapidxml/rapidxml.hpp"
-#include "demo/StatePatrol.hpp"
-#include "demo/StateCombat.hpp"
-#include "demo/StateAlert.hpp"
-#include "demo/StateAttack.hpp"
-#include "demo/StateSearch.hpp"
 
 namespace FSM
 {
@@ -31,14 +26,7 @@ namespace FSM
         FactoryMap m_FactoryMap;
         
     public:
-        StateFactory()
-        {
-            registerClass("Patrol", &StatePatrol::create);
-            registerClass("Search", &StateSearch::create);
-            registerClass("Combat", &StateCombat::create);
-            registerClass("Alert", &StateAlert::create);
-            registerClass("Attack", &StateAttack::create);
-        }
+		StateFactory() { }
         ~StateFactory() { }
         void registerClass(const std::string& name, State::createInstanceFn pfnCreate)
         {

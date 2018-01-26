@@ -72,6 +72,7 @@ namespace FSM
                     if (std::get<0>(transPair)->isValid(_blackboard))
                     {
                         transitionPair = &transPair;
+						std::cout << "[SM] Valid transition found: " << std::get<0>(transPair)->getName() << std::endl;
                         break;
                     }
                 }
