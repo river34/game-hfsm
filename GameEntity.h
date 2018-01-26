@@ -1,21 +1,19 @@
 //
-//  GameEntity.hpp
+//  GameEntity.h
 //  GameFSM
 //
 //  Created by River Liu on 6/1/2018.
 //  Copyright © 2018 River Liu. All rights reserved.
 //
 
-#ifndef GameEntity_hpp
-#define GameEntity_hpp
+#ifndef GameEntity_h
+#define GameEntity_h
 
 #include <stdio.h>
 #include <string>
 #include "gamemath/Vector3.h"
 #include "gamemath/Quaternion.h"
 using namespace std;
-
-#endif /* GameEntity_hpp */
 
 class GameEntity
 {
@@ -31,3 +29,5 @@ public:
     inline GameEntity(string _name, float _health) : m_sName(_name), m_fHealth(_health) {}
     inline bool isDead() const { return m_fHealth <= 0.f; }
 };
+
+#endif /* GameEntity_h */

@@ -1,20 +1,18 @@
 //
-//  Blackboard.hpp
+//  Blackboard.h
 //  GameFSM
 //
 //  Created by River Liu on 6/1/2018.
 //  Copyright © 2018 River Liu. All rights reserved.
 //
 
-#ifndef Blackboard_hpp
-#define Blackboard_hpp
+#ifndef Blackboard_h
+#define Blackboard_h
 
 #include <stdio.h>
 #include <string>
 #include <map>
 #include "gamemath/Vector3.h"
-
-#endif /* Blackboard_hpp */
 
 class GameEntity;
 class Blackboard
@@ -35,3 +33,5 @@ public:
         return nullptr;
     }
 };
+
+#endif /* Blackboard_h */
